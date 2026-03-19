@@ -1,0 +1,140 @@
+<div class="hero">
+  <h1 class="hero-title">
+    Welcome to <span>Oxyx Store</span>
+  </h1>
+  <p class="hero-subtitle">
+    Premium & Free Builds Marketplace. Get high-quality builds for your projects with instant download access.
+  </p>
+  <div style="display: flex; gap: 1rem; justify-content: center;">
+    <a href="#builds" class="btn btn-primary">
+      <i class="fas fa-download"></i>
+      Browse Builds
+    </a>
+    <% if (!user) { %>
+      <a href="/register" class="btn btn-secondary">
+        <i class="fas fa-user-plus"></i>
+        Get Started
+      </a>
+    <% } %>
+  </div>
+  
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-value">500+</div>
+      <div class="stat-label">Premium Builds</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">1.2K+</div>
+      <div class="stat-label">Free Builds</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">10K+</div>
+      <div class="stat-label">Downloads</div>
+    </div>
+  </div>
+</div>
+
+<section id="builds">
+  <h2 class="section-title">
+    <i class="fas fa-layer-group" style="color: var(--primary);"></i>
+    Available Builds
+  </h2>
+  
+  <% if (builds && builds.length > 0) { %>
+    <div class="builds-grid">
+      <% builds.forEach(build => { %>
+        <div class="build-card <%= build.type %>">
+          <div class="build-header">
+            <span class="build-type type-<%= build.type %>">
+              <%= build.type %>
+            </span>
+            <% if (build.type === 'premium') { %>
+              <i class="fas fa-crown" style="color: var(--accent);"></i>
+            <% } else { %>
+              <i class="fas fa-gift" style="color: var(--secondary);"></i>
+            <% } %>
+          </div>
+          
+          <h3 class="build-name"><%= build.name %></h3>
+          <p class="build-description">
+            <%= build.description || 'No description available' %>
+          </p>
+          
+          <div class="build-footer">
+            <div class="build-price <%= build.type === 'free' ? 'price-free' : 'price-premium' %>">
+              <% if (build.type === 'free') { %>
+                FREE
+              <% } else { %>
+                $<%= build.price %>
+              <% } %>
+            </div>
+            <div class="download-count">
+              <i class="fas fa-download"></i>
+              <%= build.download_count || 0 %>
+            </div>
+          </div>
+          
+          <% if (user) { %>
+            <% if (build.type === 'premium' && user.role === 'user') { %>
+              <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" disabled>
+                <i class="fas fa-lock"></i>
+                Staff Only
+              </button>
+            <% } else { %>
+              <a href="/download/<%= build.id %>" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-download"></i>
+                Download
+              </a>
+            <% } %>
+          <% } else { %>
+            <a href="/login" class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">
+              <i class="fas fa-sign-in-alt"></i>
+              Login to Download
+            </a>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-box-open"></i>
+      </div>
+      <h3 class="empty-title">No builds available yet</h3>
+      <p class="empty-text">Check back soon for new builds!</p>
+    </div>
+  <% } %>
+</section>
+
+<section style="margin-top: 4rem;">
+  <h2 class="section-title">
+    <i class="fas fa-star" style="color: var(--warning);"></i>
+    Why Choose Oxyx Store?
+  </h2>
+  
+  <div class="builds-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+    <div class="build-card" style="text-align: center;">
+      <div style="width: 60px; height: 60px; background: var(--gradient-1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem;">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Secure Downloads</h3>
+      <p style="color: var(--text-muted); font-size: 0.875rem;">All builds are verified and scanned for security.</p>
+    </div>
+    
+    <div class="build-card" style="text-align: center;">
+      <div style="width: 60px; height: 60px; background: var(--gradient-2); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem;">
+        <i class="fas fa-bolt"></i>
+      </div>
+      <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Instant Access</h3>
+      <p style="color: var(--text-muted); font-size: 0.875rem;">Download immediately after authentication.</p>
+    </div>
+    
+    <div class="build-card" style="text-align: center;">
+      <div style="width: 60px; height: 60px; background: var(--gradient-3); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem;">
+        <i class="fas fa-sync-alt"></i>
+      </div>
+      <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Regular Updates</h3>
+      <p style="color: var(--text-muted); font-size: 0.875rem;">New builds added weekly by our team.</p>
+    </div>
+  </div>
+</section>
