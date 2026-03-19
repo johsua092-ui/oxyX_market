@@ -1,0 +1,181 @@
+<h2 class="section-title">
+  <i class="fas fa-tachometer-alt" style="color: var(--primary);"></i>
+  Admin Dashboard
+</h2>
+
+<div class="admin-grid">
+  <div class="admin-card">
+    <div class="admin-card-title">
+      <i class="fas fa-box" style="color: var(--primary);"></i>
+      Total Builds
+    </div>
+    <div style="font-size: 2.5rem; font-weight: 800;"><%= builds.length %></div>
+    <div style="color: var(--text-muted); font-size: 0.875rem;">
+      <%= builds.filter(b => b.type === 'premium').length %> Premium, <%= builds.filter(b => b.type === 'free').length %> Free
+    </div>
+  </div>
+  
+  <div class="admin-card">
+    <div class="admin-card-title">
+      <i class="fas fa-users" style="color: var(--secondary);"></i>
+      Total Users
+    </div>
+    <div style="font-size: 2.5rem; font-weight: 800;"><%= users.length %></div>
+    <div style="color: var(--text-muted); font-size: 0.875rem;">
+      <%= users.filter(u => u.role === 'owner').length %> Owner, <%= users.filter(u => u.role === 'staff').length %> Staff
+    </div>
+  </div>
+  
+  <div class="admin-card">
+    <div class="admin-card-title">
+      <i class="fas fa-download" style="color: var(--accent);"></i>
+      Total Downloads
+    </div>
+    <div style="font-size: 2.5rem; font-weight: 800;">
+      <%= builds.reduce((acc, b) => acc + (b.download_count || 0), 0) %>
+    </div>
+    <div style="color: var(--text-muted); font-size: 0.875rem;">Across all builds</div>
+  </div>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <h3 class="section-title" style="margin: 0;">
+    <i class="fas fa-cube" style="color: var(--primary);"></i>
+    Manage Builds
+  </h3>
+  <a href="/admin/builds/new" class="btn btn-primary btn-sm">
+    <i class="fas fa-plus"></i>
+    Add Build
+  </a>
+</div>
+
+<div class="admin-card" style="margin-bottom: 2rem;">
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Price</th>
+          <th>Downloads</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% builds.forEach(build => { %>
+          <tr>
+            <td><strong><%= build.name %></strong></td>
+            <td>
+              <span class="build-type type-<%= build.type %>">
+                <%= build.type %>
+              </span>
+            </td>
+            <td><%= build.type === 'free' ? 'FREE' : '$' + build.price %></td>
+            <td><%= build.download_count || 0 %></td>
+            <td><%= new Date(build.created_at).toLocaleDateString() %></td>
+            <td>
+              <form action="/admin/builds/<%= build.id %>/delete" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this build?')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (user.role === 'owner') { %>
+  <h3 class="section-title">
+    <i class="fas fa-shield-alt" style="color: var(--warning);"></i>
+    IP Whitelist Management
+  </h3>
+  
+  <div class="admin-card" style="margin-bottom: 2rem;">
+    <form action="/admin/ip-whitelist" method="POST" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; margin-bottom: 1.5rem; align-items: end;">
+      <div>
+        <label class="form-label">IP Address</label>
+        <input type="text" name="ipAddress" class="form-input" placeholder="xxx.xxx.xxx.xxx" required>
+      </div>
+      <div>
+        <label class="form-label">Role</label>
+        <select name="role" class="form-input" required>
+          <option value="owner">Owner</option>
+          <option value="staff">Staff</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Assigned To</label>
+        <input type="text" name="assignedTo" class="form-input" placeholder="Username" required>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-plus"></i>
+        Add
+      </button>
+    </form>
+    
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>IP Address</th>
+            <th>Role</th>
+            <th>Assigned To</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% ips.forEach(ip => { %>
+            <tr>
+              <td><code><%= ip.ip_address %></code></td>
+              <td><span class="role-badge role-<%= ip.role %>"><%= ip.role %></span></td>
+              <td><%= ip.assigned_to %></td>
+              <td>
+                <form action="/admin/ip-whitelist/<%= ip.id %>/delete" method="POST" style="display: inline;">
+                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this IP?')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% } %>
+
+<h3 class="section-title">
+  <i class="fas fa-users-cog" style="color: var(--secondary);"></i>
+  User Management
+</h3>
+
+<div class="admin-card">
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>IP Address</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(u => { %>
+          <tr>
+            <td><strong><%= u.username %></strong></td>
+            <td><%= u.email %></td>
+            <td><span class="role-badge role-<%= u.role %>"><%= u.role %></span></td>
+            <td><code><%= u.ip_address || 'N/A' %></code></td>
+            <td><%= new Date(u.created_at).toLocaleDateString() %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
